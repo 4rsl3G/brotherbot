@@ -1,14 +1,10 @@
+from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
 import requests
 import os
 import time
-from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
 
 # Token bot Telegram Anda
 TOKEN = '6983477851:AAHD2r9rSbmeN75IspOVad485fz1_feW5kg'
-
-# Inisialisasi bot
-updater = Updater(token=TOKEN, use_context=True)
-dispatcher = updater.dispatcher
 
 # Fungsi untuk mendapatkan data dari API TikWM
 def dapatkan_data_tikwm(payload_url):
@@ -82,10 +78,13 @@ def unduh_video(update, context):
 def unknown(update, context):
     context.bot.send_message(chat_id=update.effective_chat.id, text="Perintah tidak dikenal. Gunakan /start untuk memulai.")
 
+# Token bot Telegram Anda
+updater = Updater(token=TOKEN, use_context=True)
+
 # Menambahkan handler ke dispatcher
-dispatcher.add_handler(CommandHandler("start", start))
-dispatcher.add_handler(CommandHandler("tt", unduh_video))
-dispatcher.add_handler(MessageHandler(Filters.command, unknown))
+updater.dispatcher.add_handler(CommandHandler("start", start))
+updater.dispatcher.add_handler(CommandHandler("tt", unduh_video))
+updater.dispatcher.add_handler(MessageHandler(Filters.command, unknown))
 
 # Memulai bot
 updater.start_polling()
