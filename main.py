@@ -4,7 +4,7 @@ import time
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
 
 # Token bot Telegram Anda
-TOKEN = 'YOUR_TELEGRAM_BOT_TOKEN'
+TOKEN = '6983477851:AAHD2r9rSbmeN75IspOVad485fz1_feW5kg'
 
 # Inisialisasi bot
 updater = Updater(token=TOKEN, use_context=True)
