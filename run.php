@@ -4,6 +4,7 @@ require 'vendor/autoload.php'; // Sesuaikan dengan lokasi autoload.php Anda
 
 use TelegramBot\Api\Client;
 use TelegramBot\Api\Types\Update;
+use TelegramBot\Api\Exception;
 
 // Token bot Telegram Anda
 $token = 'YOUR_TELEGRAM_BOT_TOKEN';
@@ -18,7 +19,7 @@ function dapatkanDataTikWM($payloadUrl) {
         $response = file_get_contents($urlTikWM . '?' . http_build_query($payloadUrl));
         return json_decode($response, true);
     } catch (Exception $e) {
-        echo 'Gagal mendapatkan data dari API TikWM: ' . $e->getMessage();
+        throw new Exception('Gagal mendapatkan data dari API TikWM: ' . $e->getMessage());
     }
 }
 
@@ -54,26 +55,21 @@ $bot->command('tt', function ($message) use ($bot) {
             'hd' => 1
         ];
 
-        // Mendapatkan data dari API TikWM
-        $response = dapatkanDataTikWM($payloadUrl);
+        try {
+            // Mendapatkan data dari API TikWM
+            $response = dapatkanDataTikWM($payloadUrl);
 
-        // Cari dan tampilkan nilai hdplay jika ada dalam objek data
-        if ($response && isset($response['data']['hdplay'])) {
-            $videoUrl = 'https://tikwm.com' . $response['data']['hdplay'];
+            // Cari dan tampilkan nilai hdplay jika ada dalam objek data
+            if ($response && isset($response['data']['hdplay'])) {
+                $videoUrl = 'https://tikwm.com' . $response['data']['hdplay'];
 
-            // Unduh video
-            $videoData = file_get_contents($videoUrl);
-            // Simpan video ke file lokal
-            $videoFileName = './video_' . time() . '.mp4';
-            file_put_contents($videoFileName, $videoData);
-
-            // Kirim video ke pengguna
-            $bot->sendVideo($chatId, new CURLFile($videoFileName));
-
-            // Hapus file video lokal setelah dikirim
-            unlink($videoFileName);
-        } else {
-            $bot->sendMessage($chatId, 'Tidak ada pesan hdplay yang ditemukan.');
+                // Kirim pesan dengan URL video TikTok
+                $bot->sendMessage($chatId, $videoUrl);
+            } else {
+                $bot->sendMessage($chatId, 'Tidak ada pesan hdplay yang ditemukan.');
+            }
+        } catch (Exception $e) {
+            $bot->sendMessage($chatId, 'Gagal mendapatkan data dari API TikWM: ' . $e->getMessage());
         }
     } else {
         $bot->sendMessage($chatId, 'Silakan sertakan URL video TikTok.');
